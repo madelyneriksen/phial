@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "phial"
+version = "0.1.0"
+description = "A Simple ASGI framework built for a learning process."
+authors = ["Madelyn Eriksen <madelyn.eriksen@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+uvicorn = "^0.4.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^4.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
