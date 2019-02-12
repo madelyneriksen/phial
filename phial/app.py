@@ -1,5 +1,6 @@
 import asyncio
 import re
+import functools
 from types import FunctionType
 
 
@@ -10,7 +11,7 @@ class Router:
 
     def add_route(self, route: str, view: FunctionType):
         """Add a route. Compiles a regex string and stores it with a tuple.
-        
+
         Eventually, this should use prefixes so we can more effectively search
         through paths. As it stands, finding a path will be O(n)."""
         self.routes.append(
@@ -19,7 +20,7 @@ class Router:
 
     def route(self, route: str):
         """Decorator for adding a route to the router.
-        
+
         This lets the user add routes pretty easily from Python code
         like this:
 
@@ -41,9 +42,10 @@ class Router:
                 return view, match.groupdict()
 
 
-class Phial:
-    """Our main ASGI framework object."""
-    def __init__(self, scope):
+class _Phial:
+    """The actual Phial class. Wrapped by the callable, `Phial`."""
+    def __init__(self, scope, router=Router()):
+        self.router = router
         self.scope = scope
 
     async def __call__(self, receive, send):
@@ -63,3 +65,16 @@ class Phial:
             'type': 'http.response.body',
             'body': b'Hello World.'
         })
+
+
+def Phial(router=None):
+    """Constructor for creating a Phial web server.
+
+    While technically a function, it functions more like a class that
+    wraps a class (that wraps a callable). Feeds values into a new
+    Phial class that gets called by the ASGI server for each request.
+    """
+    router = router if router else Router()
+    app = _Phial
+    app.__init__ = functools.partialmethod(app.__init__, router=router)
+    return app
