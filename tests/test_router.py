@@ -28,3 +28,4 @@ def test_can_use_decorator_to_add_routes():
     def articles():
         return "These are articles!"
     assert len(router.routes) == 1
+    assert router.dispatch('/articles/')
