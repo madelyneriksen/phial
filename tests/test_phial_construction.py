@@ -1,6 +1,5 @@
 """Test the creation of Phial objects."""
 from phial import Phial, Router
-from phial.app import _Phial
 
 
 def test_constructed_phial_is_asgiapp():
