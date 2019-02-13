@@ -40,19 +40,33 @@ class Router:
             match = route.search(path)
             if match:
                 return view, match.groupdict()
+        raise Exception("Route Not Found.")
 
 
-class _Phial:
-    """The actual Phial class. Wrapped by the callable, `Phial`."""
-    def __init__(self, scope, router=Router()):
+class Phial:
+    """A Phial webserver class.
+
+    When called, returns a callback function that the ASGI server can use,
+    while still having access to the parent Phial class.
+
+    Arguments:
+        router: a Router instance
+    """
+    def __init__(self, router=Router()):
         self.router = router
-        self.scope = scope
 
-    async def __call__(self, receive, send):
-        if self.scope['type'] == 'http':
-            await self.handle_http(receive, send)
+    def __call__(self, scope):
+        """The ASGI callback handler."""
+        async def callback(receive, send):
+            if scope['type'] == 'http':
+                await self.handle_http(receive, send, scope)
 
-    async def handle_http(self, receive, send):
+        return callback
+
+    async def handle_http(self, receive, send, scope):
+        """HTTP Handler."""
+        path = scope['path']
+        view, _ = self.router.dispatch(path)
         await send({
             'type': 'http.response.start',
             'status': 200,
@@ -60,21 +74,8 @@ class _Phial:
                 [b'content-type', b'text/plain']
             ],
         })
-        print(self.scope['path'])
+        response = await view()
         await send({
             'type': 'http.response.body',
-            'body': b'Hello World.'
+            'body': response,
         })
-
-
-def Phial(router=None):
-    """Constructor for creating a Phial web server.
-
-    While technically a function, it functions more like a class that
-    wraps a class (that wraps a callable). Feeds values into a new
-    Phial class that gets called by the ASGI server for each request.
-    """
-    router = router if router else Router()
-    app = _Phial
-    app.__init__ = functools.partialmethod(app.__init__, router=router)
-    return app

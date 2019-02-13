@@ -9,6 +9,5 @@ def test_constructed_phial_is_asgiapp():
     @router.route(r'^/hi/?$')
     def sayhi():
         return "Hello World"
-    app = Phial(router=router)({})
-    assert isinstance(app, _Phial)
+    app = Phial(router=router)
     assert app.router == router
