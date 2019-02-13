@@ -66,7 +66,7 @@ class Phial:
     async def handle_http(self, receive, send, scope):
         """HTTP Handler."""
         path = scope['path']
-        view, _ = self.router.dispatch(path)
+        view, url_params = self.router.dispatch(path)
         await send({
             'type': 'http.response.start',
             'status': 200,
@@ -74,7 +74,7 @@ class Phial:
                 [b'content-type', b'text/plain']
             ],
         })
-        response = await view()
+        response = await view(**url_params)
         await send({
             'type': 'http.response.body',
             'body': response,
