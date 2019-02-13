@@ -1,6 +1,7 @@
 import asyncio
 import re
 import functools
+from urllib.parse import parse_qs
 from types import FunctionType
 
 
@@ -43,6 +44,28 @@ class Router:
         raise Exception("Route Not Found.")
 
 
+class Request:
+    """Represents an incoming HTTP request from the ASGI server.
+
+    Handles storing get parameters, the request body,
+    and giving view function informations on the context they are
+    being called.
+    """
+    def __init__(self, scope, resolved):
+        self._scope = scope
+        self._body = resolved
+        self.path = scope['path']
+        method = scope.get('method', 'GET')
+        if method == 'GET':
+            self.build_get_params()
+
+    def build_get_params(self):
+        """Construction of more advanced parts of a request."""
+        self.GET = {}
+        qs = parse_qs(self._scope['query_string'].decode('utf-8'))
+        self.GET.update(qs)
+
+
 class Phial:
     """A Phial webserver class.
 
@@ -65,8 +88,9 @@ class Phial:
 
     async def handle_http(self, receive, send, scope):
         """HTTP Handler."""
-        path = scope['path']
-        view, url_params = self.router.dispatch(path)
+        resolved = await receive()
+        request = Request(scope, resolved)
+        view, url_params = self.router.dispatch(request.path)
         await send({
             'type': 'http.response.start',
             'status': 200,
@@ -74,7 +98,7 @@ class Phial:
                 [b'content-type', b'text/plain']
             ],
         })
-        response = await view(**url_params)
+        response = await view(request, **url_params)
         await send({
             'type': 'http.response.body',
             'body': response,
