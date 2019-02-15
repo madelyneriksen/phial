@@ -1,5 +1,5 @@
 [[package]]
-category = "dev"
+category = "main"
 description = "Atomic file writes."
 name = "atomicwrites"
 optional = false
@@ -7,7 +7,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.3.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Classes Without Boilerplate"
 name = "attrs"
 optional = false
@@ -23,7 +23,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "7.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Cross-platform colored terminal text."
 marker = "sys_platform == \"win32\""
 name = "colorama"
@@ -48,7 +48,7 @@ python-versions = "*"
 version = "0.0.11"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
@@ -59,7 +59,7 @@ version = "5.0.0"
 six = ">=1.0.0,<2.0.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "plugin and hook calling mechanisms for python"
 name = "pluggy"
 optional = false
@@ -67,7 +67,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.8.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
 optional = false
@@ -75,7 +75,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.7.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
@@ -93,7 +93,18 @@ setuptools = "*"
 six = ">=1.10.0"
 
 [[package]]
-category = "dev"
+category = "main"
+description = "Pytest support for asyncio."
+name = "pytest-asyncio"
+optional = false
+python-versions = ">= 3.5"
+version = "0.10.0"
+
+[package.dependencies]
+pytest = ">=3.0.6"
+
+[[package]]
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -132,7 +143,7 @@ python-versions = ">=3.4"
 version = "7.0"
 
 [metadata]
-content-hash = "4948d768979defb99b8aa3acba89bb6a938db75481ae74ec1c1af9baee0a36d6"
+content-hash = "834469d73326becc09f7896861eec39b9ec38bf0cfafa51cacd5f07e362d7f8a"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -146,6 +157,7 @@ more-itertools = ["38a936c0a6d98a38bcc2d03fdaaedaba9f412879461dd2ceff8d37564d652
 pluggy = ["8ddc32f03971bfdf900a81961a48ccf2fb677cf7715108f85295c67405798616", "980710797ff6a041e9a73a5787804f848996ecaa6f8a1b1e08224a5894f2074a"]
 py = ["bf92637198836372b520efcba9e020c330123be8ce527e535d185ed4b6f45694", "e76826342cefe3c3d5f7e8ee4316b80d1dd8a300781612ddbc765c17ba25a6c6"]
 pytest = ["65aeaa77ae87c7fc95de56285282546cfa9c886dc8e5dc78313db1c25e21bc07", "6ac6d467d9f053e95aaacd79f831dbecfe730f419c6c7022cb316b365cd9199d"]
+pytest-asyncio = ["9fac5100fd716cbecf6ef89233e8590a4ad61d729d1732e0a96b84182df1daaf", "d734718e25cfc32d2bf78d346e99d33724deeba774cc4afdf491530c6184b63b"]
 six = ["3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c", "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"]
 uvicorn = ["e84fc3b1e142cec395fb7c1d1a9f3cdc0d455037b96e1bed54b378db1121aaba"]
 uvloop = ["0ff2e67b693f7d2007466952dbe312075098e8f15364fda27d16e8a7f266d74d", "2d0029314dc87312ff8d46c3724363d847e5235403eced5d3f98da80a87f4828", "32dcc003e1973f3db303494f5f63db11091c86a146053773d81ac5484b10c416", "4301871418f967d0b13409f1bd10ecc7825a7f183282dcc9e19d08532e6cb2e9", "7639188ff4466d86cfd4418cd784d1198a8cc913279fb8798a4b12a4d42ad341", "a73649cd043f5d3e3ae471667c790a7ee2295b22fac7bedcae8705158f8ba111", "afdf34bf507090e4c7f5108a17240982760356b8aae4edd37180ec4f94c36cbb", "bd7a6db5dbfae0c93e27cb200bb2b9513e21a90a2d4a259b39a9b5446c4d5aa3", "cc27e903da274f76826848832f62e1ec410a43602e1e0cd4f8db8c619b1ee93e", "ec521d14ddcdd9f8d0075d7d1f82e9d8806f7f0a047d2e5bc737e9eddf7f930d"]
