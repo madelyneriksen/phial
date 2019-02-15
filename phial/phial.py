@@ -5,10 +5,22 @@ from urllib.parse import parse_qs
 from types import FunctionType
 
 
+async def default404(request, error=''):
+    """Default 404 handler."""
+    return Response(str(error), status=404)
+
+
+async def default500(request, error=''):
+    """Default 404 handler."""
+    return Response(str(error), status=500)
+
+
 class Router:
     """Route different matching string patterns to different urls."""
-    def __init__(self):
+    def __init__(self, view_404=None, view_500=None):
         self.routes = []
+        self.handler404 = view_404 if view_404 else default404
+        self.handler500 = view_500 if view_500 else default500
 
     def add_route(self, route: str, view: FunctionType):
         """Add a route. Compiles a regex string and stores it with a tuple.
@@ -41,7 +53,7 @@ class Router:
             match = route.search(path)
             if match:
                 return view, match.groupdict()
-        raise Exception("Route Not Found.")
+        return self.handler404, {"error": "Path {} Not Found".format(path)}
 
 
 class Request:
@@ -116,5 +128,8 @@ class Phial:
         resolved = await receive()
         request = Request(scope, resolved)
         view, url_params = self.router.dispatch(request.path)
-        response = await view(request, **url_params)
+        try:
+            response = await view(request, **url_params)
+        except Exception as error:
+            response = await self.router.handler500(request, error=error)
         await response.send_response(send)
