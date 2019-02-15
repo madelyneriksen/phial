@@ -1,5 +1,5 @@
 """Tests for the router."""
-from phial.app import Router
+from phial import Router
 
 
 def test_paths_match_regex_in_router():

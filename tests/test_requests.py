@@ -1,5 +1,5 @@
 """Tests for the Request class."""
-from phial.app import Request
+from phial.phial import Request
 
 
 def test_request_constructs_query_strings():
