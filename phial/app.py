@@ -66,6 +66,31 @@ class Request:
         self.GET.update(qs)
 
 
+class Response:
+    """A response object. Returned by a view."""
+    def __init__(self, body, status=200, content_type='text/html',
+                 extra_headers=None):
+        self.body = body.encode('utf-8')
+        self.status = status
+        self.content_type = content_type.encode('utf-8')
+        self.headers = extra_headers if extra_headers else []
+
+    async def send_response(self, send):
+        """Send an http response."""
+        await send({
+            'type': 'http.response.start',
+            'status': self.status,
+            'headers': [
+                [b'content_type', self.content_type],
+                *self.headers
+            ],
+        })
+        await send({
+            'type': 'http.response.body',
+            'body': self.body,
+        })
+
+
 class Phial:
     """A Phial webserver class.
 
@@ -91,15 +116,5 @@ class Phial:
         resolved = await receive()
         request = Request(scope, resolved)
         view, url_params = self.router.dispatch(request.path)
-        await send({
-            'type': 'http.response.start',
-            'status': 200,
-            'headers': [
-                [b'content-type', b'text/plain']
-            ],
-        })
         response = await view(request, **url_params)
-        await send({
-            'type': 'http.response.body',
-            'body': response,
-        })
+        await response.send_response(send)

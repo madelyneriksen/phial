@@ -1,4 +1,4 @@
-from phial import Router, Phial
+from phial import Router, Phial, Response
 
 ROUTER = Router()
 
@@ -7,10 +7,10 @@ async def say_hello(request):
     print(request._scope)
     print(request._body)
     print(request.GET)
-    return b"Hello World"
+    return Response("Hello World", content_type="text/plain")
 
 @ROUTER.route(r'^/(?P<name>[\S]*)/?$')
 async def hello_name(request, name: str):
-    return f"Hello {name}".encode('utf-8')
+    return Response(f"Hello {name}", content_type="text/plain")
 
 app = Phial(router=ROUTER)
