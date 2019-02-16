@@ -1,6 +1,5 @@
 import asyncio
 import re
-import functools
 from urllib.parse import parse_qs
 from types import FunctionType
 
