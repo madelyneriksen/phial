@@ -17,7 +17,7 @@ async def default500(request, error=''):
 class Router:
     """Route different matching string patterns to different urls."""
     def __init__(self, view_404=None, view_500=None):
-        self.routes = []
+        self.routes = {}
         self.handler404 = view_404 if view_404 else default404
         self.handler500 = view_500 if view_500 else default500
 
@@ -26,9 +26,7 @@ class Router:
 
         Eventually, this should use prefixes so we can more effectively search
         through paths. As it stands, finding a path will be O(n)."""
-        self.routes.append(
-            (re.compile(route), view)
-        )
+        self.routes[route] = [re.compile(route), view]
 
     def route(self, route: str):
         """Decorator for adding a route to the router.
@@ -48,9 +46,11 @@ class Router:
 
     def dispatch(self, path: str) -> FunctionType:
         """Search for a stored route that matches the given path."""
-        for route, view in self.routes:
-            match = route.search(path)
+        for route in self.routes:
+            regex = self.routes[route][0]
+            match = regex.search(path)
             if match:
+                view = self.routes[route][1]
                 return view, match.groupdict()
         return self.handler404, {"error": "Path {} Not Found".format(path)}
 

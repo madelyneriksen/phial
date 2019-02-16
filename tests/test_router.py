@@ -29,3 +29,16 @@ def test_can_use_decorator_to_add_routes():
         return "These are articles!"
     assert len(router.routes) == 1
     assert router.dispatch('/articles/')
+
+
+def test_overlapping_routes_replace_each_other():
+    """A new route should replace an old route with the same path."""
+    router = Router()
+    @router.route('^/$')
+    def index(request):
+        return "This is the index!"
+    @router.route('^/$')
+    def new_index(request):
+        return "This is the new index!"
+    view, _ = router.dispatch('/')
+    assert view == new_index
