@@ -1,6 +1,6 @@
 """Test the creation of Phial objects."""
-from phial import Phial, Router, Response
 import pytest
+from phial import Phial, Router, Response
 from tests.common import SendMock, receive
 
 
@@ -37,27 +37,6 @@ async def test_end_to_end_async_request():
     assert mock.sent
     assert mock.sent[0]['status'] == 200
     assert mock.sent[1]['body'] == b"Welcome to the Index"
-
-
-@pytest.mark.asyncio
-async def test_sync_request_fails():
-    """Test that syncronous requests fail and return a 500 error."""
-    router = Router()
-    @router.route(r'^/$')
-    def index(request):
-        return Response("Welcome to the Index")
-    app = Phial(router=router)
-    request_session = app(
-        {
-            'type': 'http',
-            'method': 'GET',
-            'query_string': b'',
-            'path': '/'
-        }
-    )
-    mock = SendMock()
-    await request_session(receive, mock)
-    assert mock.sent[0]['status'] == 500
 
 
 @pytest.mark.asyncio
