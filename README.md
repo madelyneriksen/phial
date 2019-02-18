@@ -30,6 +30,16 @@ Run this file `hello.py` using an ASGI server like [Uvicorn](https://www.uvicorn
 uvicorn hello:app
 ```
 
+## Running Tests
+
+After cloning the repo, install the development packages from `requirements.dev.txt`:
+
+```bash
+pip install -r requirements.dev.txt
+```
+
+Tests are run with the `pytest` command and framework.
+
 ## License
 
 * MIT License
