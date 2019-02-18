@@ -1,15 +1,16 @@
-import asyncio
+# pylint: disable=too-few-public-methods
+"""A tiny, async webframework written in Python3."""
 import re
 from urllib.parse import parse_qs
 from types import FunctionType
 
 
-async def default404(request, error=''):
+async def default404(_, error=''):
     """Default 404 handler."""
     return Response(str(error), status=404)
 
 
-async def default500(request, error=''):
+async def default500(_, error=''):
     """Default 404 handler."""
     return Response(str(error), status=500)
 
@@ -72,9 +73,9 @@ class Request:
 
     def build_get_params(self):
         """Construction of more advanced parts of a request."""
-        self.GET = {}
-        qs = parse_qs(self._scope['query_string'].decode('utf-8'))
-        self.GET.update(qs)
+        self.GET = {}  # pylint: disable=invalid-name
+        query_string = parse_qs(self._scope['query_string'].decode('utf-8'))
+        self.GET.update(query_string)
 
 
 class Response:
@@ -129,6 +130,6 @@ class Phial:
         view, url_params = self.router.dispatch(request.path)
         try:
             response = await view(request, **url_params)
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-except
             response = await self.router.handler500(request, error=error)
         await response.send_response(send)
