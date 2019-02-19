@@ -17,6 +17,15 @@ async def default500(_, error=''):
     return Response(str(error), status=500)
 
 
+class UploadedFile:
+    """A file uploaded through a multipart/form POST request."""
+    def __init__(self, file, field_name, file_name, headers):
+        self.file = file
+        self.field_name = field_name,
+        self.file_name = file_name
+        self.headers = headers
+
+
 class Router:
     """Route different matching string patterns to different urls."""
     def __init__(self, view_404=None, view_500=None):
@@ -96,12 +105,17 @@ class Request:
             safe_env = {'QUERY_STRING': '', 'REQUEST_METHOD': 'POST'}
             safe_env.update({'CONTENT_TYPE': self.content_type})
             safe_env.update({'CONTENT_LENGTH': self.headers['content-length']})
-            cgi_args = dict(fp=BytesIO(self._body['body']), environ=safe_env, keep_blank_values=True)
+            cgi_args = dict(
+                fp=BytesIO(self._body['body']),
+                environ=safe_env,
+                keep_blank_values=True
+            )
             data = cgi.FieldStorage(**cgi_args)
             data = data.list or []
             for item in data:
                 if item.filename:
-                    post[item.name] = item.filename
+                    post[item.name] = UploadedFile(item.file, item.name,
+                                                   item.filename, item.headers)
                 else:
                     post[item.name] = item.value
             self.POST = post  # pylint: disable=invalid-name
