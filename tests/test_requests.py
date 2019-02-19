@@ -8,6 +8,7 @@ def test_request_constructs_query_strings():
         'path': '/',
         'method': 'GET',
         'query_string': b'working=yes',
+        'headers': [],
     }
     resolved = {}
     request = Request(scope, resolved)

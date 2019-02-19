@@ -1,6 +1,8 @@
 # pylint: disable=too-few-public-methods
 """A tiny, async webframework written in Python3."""
 import re
+import cgi
+from io import BytesIO
 from urllib.parse import parse_qs
 from types import FunctionType
 
@@ -36,7 +38,7 @@ class Router:
         like this:
 
         @router.route(r'^/mypath$')
-        def mypath:
+        def mypath(request):
             ...
             return response
         """
@@ -67,15 +69,45 @@ class Request:
         self._scope = scope
         self._body = resolved
         self.path = scope['path']
-        method = scope.get('method', 'GET')
-        if method == 'GET':
+        self.method = scope.get('method', 'GET')
+        self.headers = {}
+        for key, value in self._scope['headers']:
+            key = key.decode('utf-8')
+            self.headers[key] = value.decode('utf-8')
+        self.content_type = self.headers.get('content-type')
+        if self.method == 'GET':
             self.build_get_params()
+        elif self.method == 'POST':
+            self.build_post_params()
 
     def build_get_params(self):
         """Construction of more advanced parts of a request."""
-        self.GET = {}  # pylint: disable=invalid-name
+        get = {}
         query_string = parse_qs(self._scope['query_string'].decode('utf-8'))
-        self.GET.update(query_string)
+        get.update(query_string)
+        self.GET = get  # pylint: disable=invalid-name
+
+    def build_post_params(self):
+        """Construction of POST parameters and content"""
+        post = {}
+        # Using the CGI module to parse multipart form data.
+        # This section is inspired by similar bottle code.
+        if self.content_type.startswith('multipart/'):
+            safe_env = {'QUERY_STRING': '', 'REQUEST_METHOD': 'POST'}
+            safe_env.update({'CONTENT_TYPE': self.content_type})
+            safe_env.update({'CONTENT_LENGTH': self.headers['content-length']})
+            cgi_args = dict(fp=BytesIO(self._body['body']), environ=safe_env, keep_blank_values=True)
+            data = cgi.FieldStorage(**cgi_args)
+            data = data.list or []
+            for item in data:
+                if item.filename:
+                    post[item.name] = item.filename
+                else:
+                    post[item.name] = item.value
+            self.POST = post  # pylint: disable=invalid-name
+            return
+
+
 
 
 class Response:

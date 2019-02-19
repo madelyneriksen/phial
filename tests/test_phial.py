@@ -29,7 +29,8 @@ async def test_end_to_end_async_request():
             'type': 'http',
             'method': 'GET',
             'query_string': b'',
-            'path': '/'
+            'path': '/',
+            'headers': [],
         }
     )
     mock = SendMock()
@@ -52,7 +53,8 @@ async def test_sync_request_fails():
             'type': 'http',
             'method': 'GET',
             'query_string': b'',
-            'path': '/'
+            'path': '/',
+            'headers': []
         }
     )
     mock = SendMock()
@@ -70,7 +72,8 @@ async def test_route_not_found():
             'type': 'http',
             'method': 'GET',
             'query_string': b'',
-            'path': '/hello'
+            'path': '/hello',
+            'headers': []
         }
     )
     mock = SendMock()

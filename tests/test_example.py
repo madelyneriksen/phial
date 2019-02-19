@@ -13,7 +13,8 @@ async def test_index_returns_okay():
             'type': 'http',
             'method': 'GET',
             'query_string': b'',
-            'path': '/'
+            'path': '/',
+            'headers': []
         }
     )
     await request_session(receive, mock)
@@ -31,7 +32,8 @@ async def test_custom_greeting_returns_okay():
             'type': 'http',
             'method': 'GET',
             'query_string': b'',
-            'path': '/maddie/'
+            'path': '/maddie/',
+            'headers': []
         }
     )
     await request_session(receive, mock)
@@ -49,7 +51,8 @@ async def test_absent_route_404s():
             'type': 'http',
             'method': 'GET',
             'query_string': b'',
-            'path': '/blog/articles/'
+            'path': '/blog/articles/',
+            'headers': []
         }
     )
     await request_session(receive, mock)
