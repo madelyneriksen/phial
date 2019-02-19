@@ -21,7 +21,7 @@ class UploadedFile:
     """A file uploaded through a multipart/form POST request."""
     def __init__(self, file, field_name, file_name, headers):
         self.file = file
-        self.field_name = field_name,
+        self.field_name = field_name
         self.file_name = file_name
         self.headers = headers
 
@@ -120,8 +120,6 @@ class Request:
                     post[item.name] = item.value
             self.POST = post  # pylint: disable=invalid-name
             return
-
-
 
 
 class Response:
