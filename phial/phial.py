@@ -74,9 +74,12 @@ class Request:
     and giving view function informations on the context they are
     being called.
     """
-    def __init__(self, scope, resolved):
+    @classmethod
+    async def create(cls, scope, receive):
+        """Async factory method for creating a request object."""
+        self = Request()
         self._scope = scope
-        self._body = resolved
+        self._body = receive
         self.path = scope['path']
         self.method = scope.get('method', 'GET')
         self.headers = {}
@@ -88,6 +91,7 @@ class Request:
             self.build_get_params()
         elif self.method == 'POST':
             self.build_post_params()
+        return self
 
     def build_get_params(self):
         """Construction of more advanced parts of a request."""
@@ -170,7 +174,7 @@ class Phial:
     async def handle_http(self, receive, send, scope):
         """HTTP Handler."""
         resolved = await receive()
-        request = Request(scope, resolved)
+        request = await Request.create(scope, resolved)
         view, url_params = self.router.dispatch(request.path)
         try:
             response = await view(request, **url_params)
