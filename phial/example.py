@@ -8,7 +8,7 @@ router = Router()
 async def say_hello(request):
     """Say hello to the world!!!"""
     print(request._scope)
-    print(request._body)
+    print(request.body)
     print(request.headers)
     return Response("Hello World", content_type="text/plain")
 

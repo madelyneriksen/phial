@@ -1,4 +1,4 @@
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods, attribute-defined-outside-init
 """A tiny, async webframework written in Python3."""
 import re
 import cgi
@@ -79,26 +79,39 @@ class Request:
         """Async factory method for creating a request object."""
         self = Request()
         self._scope = scope
-        self._body = receive
+        self.body = await self.receive_body(receive)
         self.path = scope['path']
         self.method = scope.get('method', 'GET')
         self.headers = {}
-        for key, value in self._scope['headers']:
+        for key, value in scope['headers']:
             key = key.decode('utf-8')
             self.headers[key] = value.decode('utf-8')
         self.content_type = self.headers.get('content-type')
         if self.method == 'GET':
-            self.build_get_params()
+            self.GET = self.build_get_params() #  pylint: disable=invalid-name
         elif self.method == 'POST':
-            self.build_post_params()
+            self.POST = self.build_post_params() #  pylint: disable=invalid-name
         return self
+
+    async def receive_body(self, receive):
+        """Load all of the body contained in the request and store it.
+
+        This is based off a similar example from the Uvicorn documentation.
+        """
+        body = b''
+        more_body = True
+        while more_body:
+            message = await receive()
+            body += message.get('body', b'')
+            more_body = message.get('more_body', False)
+        return body
 
     def build_get_params(self):
         """Construction of more advanced parts of a request."""
         get = {}
         query_string = parse_qs(self._scope['query_string'].decode('utf-8'))
         get.update(query_string)
-        self.GET = get  # pylint: disable=invalid-name
+        return get
 
     def build_post_params(self):
         """Construction of POST parameters and content"""
@@ -110,7 +123,7 @@ class Request:
             safe_env.update({'CONTENT_TYPE': self.content_type})
             safe_env.update({'CONTENT_LENGTH': self.headers['content-length']})
             cgi_args = dict(
-                fp=BytesIO(self._body['body']),
+                fp=BytesIO(self.body),
                 environ=safe_env,
                 keep_blank_values=True
             )
@@ -122,8 +135,7 @@ class Request:
                                                    item.filename, item.headers)
                 else:
                     post[item.name] = item.value
-            self.POST = post  # pylint: disable=invalid-name
-            return
+        return post
 
 
 class Response:
@@ -173,8 +185,7 @@ class Phial:
 
     async def handle_http(self, receive, send, scope):
         """HTTP Handler."""
-        resolved = await receive()
-        request = await Request.create(scope, resolved)
+        request = await Request.create(scope, receive)
         view, url_params = self.router.dispatch(request.path)
         try:
             response = await view(request, **url_params)

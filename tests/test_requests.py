@@ -1,5 +1,6 @@
 """Tests for the Request class."""
 import pytest
+from tests.common import receive
 from phial.phial import Request
 
 @pytest.mark.asyncio
@@ -11,7 +12,6 @@ async def test_request_constructs_query_strings():
         'query_string': b'working=yes',
         'headers': [],
     }
-    resolved = {}
-    request = await Request.create(scope, resolved)
+    request = await Request.create(scope, receive)
     assert request.GET['working']
     assert request.GET['working'] == ['yes']
