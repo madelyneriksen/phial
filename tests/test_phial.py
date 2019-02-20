@@ -1,4 +1,5 @@
 """Test the creation of Phial objects."""
+# TODO: Create tests for malformed or incomplete headers.
 import pytest
 from phial import Phial, Router, Response
 from tests.common import SendMock, receive
@@ -79,3 +80,37 @@ async def test_route_not_found():
     mock = SendMock()
     await request_session(receive, mock)
     assert mock.sent[0]['status'] == 404
+
+# Currently an xfail because I need to finish mocking out the request
+@pytest.mark.xfail
+@pytest.mark.asyncio
+async def test_post_multipart_form_file_uploads():
+    """Test that posted multipart file uploads have the filename."""
+    router = Router()
+    @router.route(r'^/$')
+    async def echo_post(request):
+        filename = request.POST.get('upload')
+        return Response(filename)
+    app = Phial(router=router)
+    request_session = app(
+        {
+            'type': 'http',
+            'method': 'POST',
+            'query_string': b'',
+            'path': '/',
+            'headers': [
+                [
+                    b'content-type',
+                    b'multipart/form-data; boundary=X-TESTING-BOUNDARY'
+                ],
+                [
+                    b'content-length',
+                    b'200'
+                ]
+            ]
+        }
+    )
+    mock = SendMock()
+    await request_session(receive, mock)
+    assert mock.sent[0]['status'] == 200
+    assert mock.sent[1]['body'] == b'hello.txt'
