@@ -7,7 +7,7 @@ I took heavy inspiration from the [Bottle](https://bottlepy.org/docs/dev/) frame
 
 ## Using Phial
 
-**Note:** Phial isn't ready for use in production!
+**Note: Phial isn't for use in production! I created Phial to understand more about the HTTP protocol. If you need an async microframework, try [Starlette](https://github.com/encode/starlette)**
 
 Creating a "Hello, world!" in Phial is simple, it should look familiar if you have ever used Flask, Bottle, or another micro-framework:
 
