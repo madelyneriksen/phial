@@ -120,8 +120,10 @@ class Request:
         # This section is inspired by similar bottle code.
         if self.content_type.startswith('multipart/'):
             safe_env = {'QUERY_STRING': '', 'REQUEST_METHOD': 'POST'}
-            safe_env.update({'CONTENT_TYPE': self.content_type})
-            safe_env.update({'CONTENT_LENGTH': self.headers['content-length']})
+            if self.content_type:
+                safe_env.update({'CONTENT_TYPE': self.content_type})
+            if self.headers.get('content-length'):
+                safe_env.update({'CONTENT_LENGTH': self.headers['content-length']})
             cgi_args = dict(
                 fp=BytesIO(self.body),
                 environ=safe_env,

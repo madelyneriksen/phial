@@ -82,15 +82,27 @@ async def test_route_not_found():
     assert mock.sent[0]['status'] == 404
 
 # Currently an xfail because I need to finish mocking out the request
-@pytest.mark.xfail
 @pytest.mark.asyncio
 async def test_post_multipart_form_file_uploads():
     """Test that posted multipart file uploads have the filename."""
     router = Router()
     @router.route(r'^/$')
     async def echo_post(request):
-        filename = request.POST.get('upload')
-        return Response(filename)
+        file = request.POST.get('upload')
+        assert file
+        return Response(file.file_name)
+    async def mock_form_multipart():
+        return {
+            'type': 'http.request',
+            'body': bytes("""
+--boundary
+Content-Disposition: form-data; name="upload"; filename="hello.txt"
+
+hello
+--boundary--
+""", "utf-8"),
+            "more_body": False,
+        }
     app = Phial(router=router)
     request_session = app(
         {
@@ -101,16 +113,12 @@ async def test_post_multipart_form_file_uploads():
             'headers': [
                 [
                     b'content-type',
-                    b'multipart/form-data; boundary=X-TESTING-BOUNDARY'
+                    b'multipart/form-data; boundary=boundary'
                 ],
-                [
-                    b'content-length',
-                    b'200'
-                ]
             ]
         }
     )
     mock = SendMock()
-    await request_session(receive, mock)
+    await request_session(mock_form_multipart, mock)
     assert mock.sent[0]['status'] == 200
     assert mock.sent[1]['body'] == b'hello.txt'
