@@ -121,3 +121,25 @@ async def test_post_multipart_form_file_uploads():
     await request_session(mock_form_multipart, mock)
     assert mock.sent[0]['status'] == 200
     assert mock.sent[1]['body'] == b'hello.txt'
+
+@pytest.mark.asyncio
+async def test_no_typerror_when_missing_content_type():
+    """Catches a type error when the client sends a bad request."""
+    router = Router()
+    @router.route(r'^/$')
+    async def index(request):
+        return Response('Still alive')
+
+    app = Phial(router=router)
+    request_session = app(
+        {
+            'type': 'http',
+            'method': 'POST',
+            'query_string': b'',
+            'path': '/',
+            'headers': [],
+        }
+    )
+    mock = SendMock()
+    await request_session(receive, mock)
+    assert mock.sent[0]['status'] == 200

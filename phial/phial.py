@@ -86,7 +86,10 @@ class Request:
         for key, value in scope['headers']:
             key = key.decode('utf-8')
             self.headers[key] = value.decode('utf-8')
-        self.content_type = self.headers.get('content-type')
+        self.content_type = self.headers.get(
+            'content-type',
+            'application/x-www-form-urlencoded'
+        )
         if self.method == 'GET':
             self.GET = self.build_get_params() #  pylint: disable=invalid-name
         elif self.method == 'POST':
